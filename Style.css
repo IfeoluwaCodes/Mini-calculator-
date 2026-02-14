@@ -3,15 +3,15 @@ body {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: #f4f4f4;
-    font-family: Arial, sans-serif;
+    background: #cce7ff;
+    font-family: Times New Roman, sans-serif;
 }
 
 .calculator {
-    background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    background: black;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
 }
 
 #display {
