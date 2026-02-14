@@ -8,28 +8,33 @@ body {
 }
 
 .calculator {
-    background: black;
-    padding: 30px;
+    background: #1f2937;
+    padding: 25px;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    width: 320px; /* Fixed width */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center; /* Centers the content */
 }
 
 #display {
-    width: 100%;               /* fills the container */
-    height: 60px;              /* tall enough to see text */
-    font-size: 24px;           /* big text for readability */
-    text-align: right;         /* numbers align to the right */
-    padding: 10px;             /* space inside the box */
-    border-radius: 12px;       /* rounded corners */
-    border: none;              /* no default border */
-    background-color: #1f2937; /* dark background so text is visible */
-    color: white;              /* text color */
+    width: 90%; /* Use 90% of the container width */
+    height: 60px;
+    font-size: 24px;
+    text-align: right;
+    padding: 10px;
+    border-radius: 12px;
+    background-color: #1f2937;
+    color: white;
+    border: none;
 }
-
 .buttons {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 5px;
+    border-radius: 10px;
 }
 
 button {
