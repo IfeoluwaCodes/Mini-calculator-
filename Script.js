@@ -1,217 +1,160 @@
-        let currentOperand = '0';
-        let previousOperand = '';
-        let operation = undefined;
-        let shouldResetScreen = false;
-        let ans = 0;
-        let isInverse = false;
-        let angleMode = 'deg'; // 'deg' or 'rad'
 
-        const currentOperandElement = document.getElementById('currentOperand');
-        const previousOperandElement = document.getElementById('previousOperand');
+let currentOperand = '0';
+let ans = 0;
+let angleMode = 'deg';
+let isInverse = false;
 
-        function updateDisplay() {
-            currentOperandElement.innerText = currentOperand;
-            if (operation != null) {
-                previousOperandElement.innerText = `${previousOperand} ${operation}`;
-            } else {
-                previousOperandElement.innerText = previousOperand;
-            }
+const currentOperandElement = document.getElementById('currentOperand');
+const previousOperandElement = document.getElementById('previousOperand');
+
+function updateDisplay() {
+    currentOperandElement.innerText = currentOperand;
+}
+
+function appendNumber(value) {
+    if (currentOperand === '0') currentOperand = '';
+    currentOperand += value;
+    updateDisplay();
+}
+
+function appendOperator(op) {
+    if (op === '×') op = '*';
+    if (op === '÷') op = '/';
+    if (op === '^') op = '**';
+    if (op === 'exp') op = 'e';
+    currentOperand += op;
+    updateDisplay();
+}
+
+function clearEntry() {
+    currentOperand = '0';
+    updateDisplay();
+}
+
+function clearAll() {
+    currentOperand = '0';
+    previousOperandElement.innerText = '';
+    updateDisplay();
+}
+
+function getAns() {
+    currentOperand = ans.toString();
+    updateDisplay();
+}
+
+function setMode(mode) {
+    angleMode = mode;
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.innerText.toLowerCase() === mode) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+function toggleInverse() {
+    isInverse = !isInverse;
+}
+
+function toRadians(val) {
+    return angleMode === 'deg' ? val * Math.PI / 180 : val;
+}
+
+function toDegrees(val) {
+    return angleMode === 'deg' ? val * 180 / Math.PI : val;
+}
+
+function factorial(n) {
+    if (n < 0 || !Number.isInteger(n)) return NaN;
+    if (n > 170) return Infinity;
+    let result = 1;
+    for (let i = 2; i <= n; i++) result *= i;
+    return result;
+}
+
+function calculateFunction(func) {
+    try {
+        let value = evaluateExpression(currentOperand);
+        let result;
+
+        switch(func) {
+            case 'sin':
+                result = isInverse ? toDegrees(Math.asin(value)) : Math.sin(toRadians(value));
+                break;
+            case 'cos':
+                result = isInverse ? toDegrees(Math.acos(value)) : Math.cos(toRadians(value));
+                break;
+            case 'tan':
+                result = isInverse ? toDegrees(Math.atan(value)) : Math.tan(toRadians(value));
+                break;
+            case 'ln':
+                if (value <= 0) throw "Invalid input";
+                result = isInverse ? Math.exp(value) : Math.log(value);
+                break;
+            case 'log':
+                if (value <= 0) throw "Invalid input";
+                result = isInverse ? 10 ** value : Math.log10(value);
+                break;
+            case 'sqrt':
+                if (value < 0) throw "Invalid input";
+                result = Math.sqrt(value);
+                break;
+            case 'x²':
+                result = value ** 2;
+                break;
+            case '!':
+                result = factorial(value);
+                break;
         }
 
-        function appendNumber(number) {
-            if (shouldResetScreen) {
-                currentOperand = '';
-                shouldResetScreen = false;
-            }
-            if (number === 'π') {
-                currentOperand = Math.PI.toString();
-            } else if (number === 'e') {
-                currentOperand = Math.E.toString();
-            } else {
-                if (currentOperand === '0' && number !== '.') {
-                    currentOperand = number.toString();
-                } else {
-                    currentOperand += number.toString();
-                }
-            }
-            updateDisplay();
-        }
+        if (!isFinite(result)) throw "Math Error";
 
-        function appendOperator(op) {
-            if (currentOperand === '') return;
-            if (previousOperand !== '') {
-                calculate();
-            }
-            operation = op;
-            previousOperand = currentOperand;
-            currentOperand = '';
-            updateDisplay();
-        }
-
-        function calculate() {
-            let computation;
-            const prev = parseFloat(previousOperand);
-            const current = parseFloat(currentOperand);
-            
-            if (isNaN(prev) || isNaN(current)) return;
-            
-            switch (operation) {
-                case '+':
-                    computation = prev + current;
-                    break;
-                case '-':
-                    computation = prev - current;
-                    break;
-                case '×':
-                    computation = prev * current;
-                    break;
-                case '÷':
-                    if (current === 0) {
-                        alert("Cannot divide by zero!");
-                        return;
-                    }
-                    computation = prev / current;
-                    break;
-                case '%':
-                    computation = prev % current;
-                    break;
-                case '^':
-                    computation = Math.pow(prev, current);
-                    break;
-                case 'exp':
-                    computation = prev * Math.pow(10, current);
-                    break;
-                default:
-                    return;
-            }
-            
-            currentOperand = computation.toString();
-            operation = undefined;
-            previousOperand = '';
-            ans = computation;
-            shouldResetScreen = true;
-            updateDisplay();
-        }
-
-        function calculateFunction(func) {
-            let value = parseFloat(currentOperand);
-            if (isNaN(value)) return;
-            
-            let result;
-            let toRad = angleMode === 'deg' ? Math.PI / 180 : 1;
-            let toDeg = angleMode === 'deg' ? 180 / Math.PI : 1;
-            
-            switch(func) {
-                case 'sin':
-                    result = isInverse ? Math.asin(value) * toDeg : Math.sin(value * toRad);
-                    break;
-                case 'cos':
-                    result = isInverse ? Math.acos(value) * toDeg : Math.cos(value * toRad);
-                    break;
-                case 'tan':
-                    result = isInverse ? Math.atan(value) * toDeg : Math.tan(value * toRad);
-                    break;
-                case 'ln':
-                    result = isInverse ? Math.exp(value) : Math.log(value);
-                    break;
-                case 'log':
-                    result = isInverse ? Math.pow(10, value) : Math.log10(value);
-                    break;
-                case 'sqrt':
-                    result = Math.sqrt(value);
-                    break;
-                case 'x²':
-                    result = Math.pow(value, 2);
-                    break;
-                case '!':
-                    result = factorial(value);
-                    break;
-            }
-            
-            if (isInverse && ['sin', 'cos', 'tan'].includes(func)) {
-                isInverse = false;
-                updateInverseButtons();
-            }
-            
-            currentOperand = result.toString();
-            ans = result;
-            shouldResetScreen = true;
-            updateDisplay();
-        }
-
-        function factorial(n) {
-            if (n < 0) return NaN;
-            if (n === 0 || n === 1) return 1;
-            let result = 1;
-            for (let i = 2; i <= n; i++) {
-                result *= i;
-            }
-            return result;
-        }
-
-        function toggleInverse() {
-            isInverse = !isInverse;
-            updateInverseButtons();
-        }
-
-        function updateInverseButtons() {
-            const buttons = document.querySelectorAll('.btn-scientific');
-            buttons.forEach(btn => {
-                if (btn.innerText === 'sin') btn.innerText = isInverse ? 'sin⁻¹' : 'sin';
-                if (btn.innerText === 'cos') btn.innerText = isInverse ? 'cos⁻¹' : 'cos';
-                if (btn.innerText === 'tan') btn.innerText = isInverse ? 'tan⁻¹' : 'tan';
-                if (btn.innerText === 'ln') btn.innerText = isInverse ? 'eˣ' : 'ln';
-                if (btn.innerText === 'log') btn.innerText = isInverse ? '10ˣ' : 'log';
-            });
-        }
-
-        function setMode(mode) {
-            angleMode = mode;
-            document.querySelectorAll('.mode-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.innerText.toLowerCase() === mode) {
-                    btn.classList.add('active');
-                }
-            });
-        }
-
-        function getAns() {
-            currentOperand = ans.toString();
-            shouldResetScreen = true;
-            updateDisplay();
-        }
-
-        function clearEntry() {
-            currentOperand = '0';
-            updateDisplay();
-        }
-
-        function clearAll() {
-            currentOperand = '0';
-            previousOperand = '';
-            operation = undefined;
-            updateDisplay();
-        }
-
-        // Keyboard support
-        document.addEventListener('keydown', (e) => {
-            if (e.key >= '0' && e.key <= '9') appendNumber(e.key);
-            if (e.key === '.') appendNumber('.');
-            if (e.key === '+') appendOperator('+');
-            if (e.key === '-') appendOperator('-');
-            if (e.key === '*') appendOperator('×');
-            if (e.key === '/') appendOperator('÷');
-            if (e.key === '%') appendOperator('%');
-            if (e.key === '^') appendOperator('^');
-            if (e.key === 'Enter' || e.key === '=') calculate();
-            if (e.key === 'Escape') clearAll();
-            if (e.key === 'Backspace') {
-                currentOperand = currentOperand.slice(0, -1) || '0';
-                updateDisplay();
-            }
-            if (e.key === '(') appendNumber('(');
-            if (e.key === ')') appendNumber(')');
-        });
-
-        // Initialize
+        currentOperand = result.toString();
+        ans = result;
+        isInverse = false;
         updateDisplay();
+
+    } catch {
+        alert("Invalid Input");
+    }
+}
+
+function evaluateExpression(expression) {
+    expression = expression
+        .replace(/π/g, Math.PI)
+        .replace(/e/g, Math.E)
+        .replace(/√/g, 'Math.sqrt')
+        .replace(/\^/g, '**')
+        .replace(/×/g, '*')
+        .replace(/÷/g, '/')
+        .replace(/%/g, '/100');
+
+    return Function('"use strict";return (' + expression + ')')();
+}
+
+function calculate() {
+    try {
+        let result = evaluateExpression(currentOperand);
+        if (!isFinite(result)) throw "Error";
+        currentOperand = result.toString();
+        ans = result;
+        updateDisplay();
+    } catch {
+        alert("Invalid Expression");
+    }
+}
+
+/* Keyboard Support */
+document.addEventListener('keydown', (e) => {
+    if (!isNaN(e.key)) appendNumber(e.key);
+    if (e.key === '.') appendNumber('.');
+    if (['+', '-', '*', '/', '(', ')'].includes(e.key)) appendNumber(e.key);
+    if (e.key === 'Enter') calculate();
+    if (e.key === 'Backspace') {
+        currentOperand = currentOperand.slice(0, -1) || '0';
+        updateDisplay();
+    }
+    if (e.key === 'Escape') clearAll();
+});
+
+updateDisplay();
